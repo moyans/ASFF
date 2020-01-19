@@ -8,28 +8,28 @@ from pycocotools.coco import COCO
 
 from utils.utils import *
 
-COCO_CLASSES=(
-'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck',
-'boat', 'traffic light', 'fire hydrant', 'street sign', 'stop sign',
-'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-'elephant', 'bear', 'zebra', 'giraffe', 'hat', 'backpack', 'umbrella',
-'shoe', 'eye glasses', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
-'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
-'skateboard', 'surfboard', 'tennis racket', 'bottle', 'plate', 'wine glass',
-'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
-'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
-'couch', 'potted plant', 'bed', 'mirror', 'dining table', 'window', 'desk',
-'toilet', 'door', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'blender', 'book',
-'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
+COCO_CLASSES=('3477')
+# 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck',
+# 'boat', 'traffic light', 'fire hydrant', 'street sign', 'stop sign',
+# 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+# 'elephant', 'bear', 'zebra', 'giraffe', 'hat', 'backpack', 'umbrella',
+# 'shoe', 'eye glasses', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
+# 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
+# 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'plate', 'wine glass',
+# 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
+# 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
+# 'couch', 'potted plant', 'bed', 'mirror', 'dining table', 'window', 'desk',
+# 'toilet', 'door', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+# 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'blender', 'book',
+# 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
 
 
 class COCODataset(Dataset):
     """
     COCO dataset class.
     """
-    def __init__(self, data_dir='data/COCO', json_file='instances_train2017.json',
-                 name='train2017', img_size=(416,416), preproc=None, debug=False, voc=False):
+    def __init__(self, data_dir='data/COCO', json_file='instances_SkuDetTrainSetData2019',
+                 name='SkuDetTrainSetData2019', img_size=(416,416), preproc=None, debug=False, voc=False):
         """
         COCO dataset initialization. Annotation data are read into memory by COCO API.
         Args:
@@ -41,8 +41,14 @@ class COCODataset(Dataset):
             debug (bool): if True, only one data id is selected from the dataset
         """
         super().__init__(img_size)
+
+
+
         self.data_dir = data_dir
-        self.json_file = json_file
+        if '.json' not in json_file:
+            self.json_file = json_file+'.json'
+        else:
+            self.json_file = json_file
         self.voc = voc
         if voc:
             self.coco = COCO(self.data_dir+'VOC2007/Annotations/'+self.json_file)
@@ -64,7 +70,6 @@ class COCODataset(Dataset):
         return len(self.ids)
 
     def pull_item(self, index):
-
         id_ = self.ids[index]
 
         im_ann = self.coco.loadImgs(id_)[0]
@@ -74,9 +79,9 @@ class COCODataset(Dataset):
         annotations = self.coco.loadAnns(anno_ids)
 
         # load image and preprocess
-        img_file = os.path.join(self.data_dir, 'images', self.name,
-                                #'COCO_'+self.name+'_'+'{:012}'.format(id_) + '.jpg')
-                                '{:012}'.format(id_) + '.jpg')
+        img_file = os.path.join(self.data_dir, 'coco_' + self.name, self.coco.imgs[id_]['file_name'])
+        # img_file = os.path.join(self.data_dir, 'images', self.name,
+        #                         '{:012}'.format(id_) + '.jpg')                            
 
         if self.voc:
             file_name = im_ann['file_name']
@@ -138,6 +143,9 @@ class COCODataset(Dataset):
                 dx, dy (int): pad size
             id_ (int): same as the input index. Used for evaluation.
         """
+
+        # from pudb import set_trace
+        # set_trace()
         img, res, img_info, id_ = self.pull_item(index)
 
         if self.preproc is not None:

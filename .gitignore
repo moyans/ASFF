@@ -19,3 +19,6 @@ trained_model/
 dist/
 *.egg-info/
 
+.vscode
+
+data/

@@ -46,8 +46,12 @@ class COCOAPIEvaluator():
             nmsthre (float):
                 IoU threshold of non-max supression ranging from 0 to 1.
         """
-        json_f = 'instances_val2017.json'
-        name='val2017'
+        # json_f = 'instances_val2017.json'
+        # name='val2017'
+        
+        json_f = 'instances_SkuDetData2019'
+        name='SkuDetData2019'
+
         if testset:
             json_f = 'image_info_test-dev2017.json'
             name='test2017'
@@ -101,7 +105,8 @@ class COCOAPIEvaluator():
         else:
             dis_indices = indices
         progress_bar = tqdm if distributed_util.is_main_process() else iter
-        num_classes = 80 if not self.voc else 20
+        # num_classes = 80 if not self.voc else 20
+        num_classes = 1 if not self.voc else 20
 
         inference_time=0
         nms_time=0

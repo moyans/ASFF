@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument('--distributed', dest='distributed', action='store_true', default=False,
                         help='distributed training')
     parser.add_argument('--local_rank', type=int,
-                            default=0, help='local_rank')
+                            default=10000, help='local_rank')
     parser.add_argument('--ngpu', type=int, default=10,
                         help='number of gpu')
     parser.add_argument('--start_epoch', type=int,
@@ -94,6 +94,7 @@ def main():
     os.makedirs(args.log_dir, exist_ok=True)
     os.makedirs(args.save_dir, exist_ok=True)
 
+    # args.local_rank = 1000
     if args.distributed:
         torch.cuda.set_device(args.local_rank)
         torch.distributed.init_process_group(backend="nccl", init_method="env://")
@@ -128,13 +129,22 @@ def main():
     # Learning rate setup
     base_lr = lr
 
+    # if args.dataset == 'COCO':
+    #     dataset = COCODataset(
+    #               data_dir='data/COCO/',
+    #               img_size=input_size,
+    #               preproc=TrainTransform(rgb_means=(0.485, 0.456, 0.406),std=(0.229, 0.224, 0.225),max_labels=50),
+    #               debug=args.debug)
+    #     num_class = 80
     if args.dataset == 'COCO':
         dataset = COCODataset(
+                  json_file='instances_SkuDetTrainSetData2019',
+                  name='SkuDetTrainSetData2019',
                   data_dir='data/COCO/',
                   img_size=input_size,
-                  preproc=TrainTransform(rgb_means=(0.485, 0.456, 0.406),std=(0.229, 0.224, 0.225),max_labels=50),
+                  preproc=TrainTransform(rgb_means=(0.485, 0.456, 0.406),std=(0.229, 0.224, 0.225),max_labels=30),
                   debug=args.debug)
-        num_class = 80
+        num_class = 1
     elif args.dataset == 'VOC':
         train_sets = [('2007', 'trainval'), ('2012', 'trainval')]
         dataset = VOCDetection(root='data/VOC',

@@ -45,6 +45,7 @@ class MixupDetection(Dataset):
     @Dataset.resize_getitem
     def __getitem__(self, idx):
         self._dataset._input_dim = self.input_dim
+         
         # first image
         img1, label1, _, _= self._dataset.pull_item(idx)
         lambd = 1
